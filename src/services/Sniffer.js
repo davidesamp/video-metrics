@@ -5,6 +5,8 @@ const config = {
 }
 let lastDecodedFrames = 0;
 let lastDroppedFrames = 0;
+let lastDecodedBytes = 0;
+let lastDecodedAudioBytes = 0;
 let intervalId;
 let cachedDecodedFrames = [];
 let Report = {
@@ -21,6 +23,22 @@ const CDF_SIZE = 5;
 
 const getDecodedFrameCount  = (video)  => {
     return video.webkitDecodedFrameCount;
+}
+
+const getDecodedVideoByteCount  = (video)  => {
+    return video.webkitVideoDecodedByteCount;
+}
+
+const getDecodedAudioByteCount = (video) => {
+  return video.webkitAudioDecodedByteCount;
+}
+
+const displayIsFullscreen = (video) => {
+  return video.webkitDisplayingFullscreen;
+}
+
+const displaySupportFullScreen = (video) => {
+  return video.webkitSupportsFullscreen;
 }
 
 const getDroppedFrameCount = (video) => {
@@ -75,7 +93,6 @@ const sendJsonSnapshots = (snapshots, metricId) => {
         url: config.server + 'snaphots',
         data : snap
       }).then(res => {
-         debugger;
          console.log(res);
          console.log(res.data);
       });
@@ -90,16 +107,24 @@ export const sniffVideoMetrics = () => {
         function () {
           Report.decodedFrames = getDecodedFrameCount(video);
           Report.droppedFrames = getDroppedFrameCount(video);
-
+          Report.decodedBytes = getDecodedVideoByteCount(video)
+          Report.decodedAudioBytes = getDecodedAudioByteCount(video);
+          Report.displaySupportFullscreen = displaySupportFullScreen(video);
 
           // Create snapshot of the video frames performance data
           var snapshot = {
             effectiveTime: new Date(),
             decodedFrames: Report.decodedFrames - lastDecodedFrames,
-            droppedFrames: Report.droppedFrames - lastDroppedFrames
+            droppedFrames: Report.droppedFrames - lastDroppedFrames,
+            decodedBytes: Report.decodedBytes - lastDecodedBytes,
+            decodedAudioBytes: Report.decodedAudioBytes -lastDecodedAudioBytes,
+            displayIsFullscreen: displayIsFullscreen(video),
           };
+
           lastDecodedFrames = Report.decodedFrames;
           lastDroppedFrames = Report.droppedFrames;
+          lastDecodedBytes = Report.decodedBytes;
+          lastDecodedAudioBytes = Report.decodedAudioBytes;
 
           // As soon as we start decoding video frames, collect data
           if (snapshot.decodedFrames > 0) {
