@@ -53,23 +53,34 @@ const ID = () => {
 const sendJsonReport = (Report) => {
     const snapshots = Report.snapshots;
     delete Report.snapshots;
-     axios.post(config.server + 'metrics', JSON.stringify(Report)).then(res => {        
-        console.log(res);
-        console.log(res.data);
+    const jsonReport = JSON.stringify(Report)
+     axios({
+       method: 'POST',
+       url: config.server + 'metrics',
+       data : Report
+      }).then(res => {
         const {id, decodeFrames } = res.data;
-        sendJsonSnapshots(Report.snapshots, id)
+        sendJsonSnapshots(snapshots, id)
      });
   }
 
 const sendJsonSnapshots = (snapshots, metricId) => {
-  snapshots.forEach((snap) => {
+  if(Array.isArray(snapshots))
+  {
+    snapshots.forEach((snap) => {
       snap.metricId = metricId;
-      axios.post(config.server + 'snapshots', JSON.stringify(snap)).then(res => {
+
+      axios({
+        method: 'POST',
+        url: config.server + 'snaphots',
+        data : snap
+      }).then(res => {
          debugger;
          console.log(res);
          console.log(res.data);
       });
   })
+  }
 }
 
 export const sniffVideoMetrics = () => {
@@ -83,7 +94,7 @@ export const sniffVideoMetrics = () => {
 
           // Create snapshot of the video frames performance data
           var snapshot = {
-            timestamp: Date.now(),
+            effectiveTime: new Date(),
             decodedFrames: Report.decodedFrames - lastDecodedFrames,
             droppedFrames: Report.droppedFrames - lastDroppedFrames
           };
@@ -93,7 +104,7 @@ export const sniffVideoMetrics = () => {
           // As soon as we start decoding video frames, collect data
           if (snapshot.decodedFrames > 0) {
             Report.snapshots.push(snapshot);
-            console.log('%ctimestamp: ' + snapshot.timestamp +
+            console.log('%effectiveTime: ' + snapshot.effectiveTime +
               ' decoded frames: ' + snapshot.decodedFrames +
               ' dropped frames: ' + snapshot.droppedFrames,
               STYLE_INFO);
@@ -112,6 +123,6 @@ export const sniffVideoMetrics = () => {
             Report.snapshots.slice(0, Report.snapshots.length - CDF_SIZE + 1);
             sendJsonReport(Report);
           }
-        }, 500
+        }, 1000
       );
 }
