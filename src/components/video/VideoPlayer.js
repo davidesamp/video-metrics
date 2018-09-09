@@ -6,6 +6,7 @@ class VideoPlayer extends React.Component {
 
   componentDidMount = () => {
     sniffVideoMetrics();
+    //test
   }
   render () {
     return (
