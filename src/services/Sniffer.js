@@ -132,7 +132,7 @@ export const sniffVideoMetrics = () => {
 
           // Create snapshot of the video frames performance data
           var snapshot = {
-            effectiveTime: dateNow,
+            effectiveTime: new Date(),
             decodedFrames: Report.decodedFrames - lastDecodedFrames,
             droppedFrames: Report.droppedFrames - lastDroppedFrames,
             decodedBytes: Report.decodedBytes - lastDecodedBytes,

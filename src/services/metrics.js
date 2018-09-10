@@ -5,18 +5,7 @@ const config = {
 }
 
 export const getSessionVideoMetrics = (sessionId) => {
-  return () =>
-      new Promise((resolve, reject) => {
-        axios({
-          method: 'GET',
-          url: config.server + 'metrics',
-        }).then(res => {
-           console.log(res);
-           console.log(res.data);
-           resolve(res.data);
-        }).catch(networkError => {
-            throw networkError;
-        });;
-      });
-
+      return async => {
+        
+      }
 }
