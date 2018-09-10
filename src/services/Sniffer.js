@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { convertBytesToBits } from '../utilities/converter'
 
 const config = {
   server: 'https://5b9249cb4c818e001456e8f5.mockapi.io/video-metrics/v1/'
@@ -7,6 +8,10 @@ let lastDecodedFrames = 0;
 let lastDroppedFrames = 0;
 let lastDecodedBytes = 0;
 let lastDecodedAudioBytes = 0;
+let lastAudioBitRate = 0;
+let lastVideoBitRate = 0;
+let totalAudioBitRate = 0;
+let totalVideoBitRate = 0;
 let intervalId;
 let cachedDecodedFrames = [];
 let Report = {
@@ -100,31 +105,49 @@ const sendJsonSnapshots = (snapshots, metricId) => {
   }
 }
 
+const initSessionStorage  = () => {
+  const id = ID();
+  localStorage.setItem('sessionId', id);
+  return id;
+}
+
 export const sniffVideoMetrics = () => {
   const video = document.querySelector('video');
+  const dateNow = new Date();
+  const sessionId = initSessionStorage()
+
 
   intervalId = setInterval(
         function () {
+          Report.effectiveTime: dateNow,
           Report.decodedFrames = getDecodedFrameCount(video);
           Report.droppedFrames = getDroppedFrameCount(video);
           Report.decodedBytes = getDecodedVideoByteCount(video)
           Report.decodedAudioBytes = getDecodedAudioByteCount(video);
           Report.displaySupportFullscreen = displaySupportFullScreen(video);
+          Report.sessionId = sessionId
+          totalVideoBitRate = convertBytesToBits(Report.decodedBytes);
+          totalAudioBitRate = convertBytesToBits(Report.decodedAudioBytes);
+
 
           // Create snapshot of the video frames performance data
           var snapshot = {
-            effectiveTime: new Date(),
+            effectiveTime: dateNow,
             decodedFrames: Report.decodedFrames - lastDecodedFrames,
             droppedFrames: Report.droppedFrames - lastDroppedFrames,
             decodedBytes: Report.decodedBytes - lastDecodedBytes,
-            decodedAudioBytes: Report.decodedAudioBytes -lastDecodedAudioBytes,
+            decodedAudioBytes: Report.decodedAudioBytes - lastDecodedAudioBytes,
             displayIsFullscreen: displayIsFullscreen(video),
+            videoBitRate: totalVideoBitRate - lastVideoBitRate,
+            audioBitRate: totalAudioBitRate - lastAudioBitRate,
           };
 
           lastDecodedFrames = Report.decodedFrames;
           lastDroppedFrames = Report.droppedFrames;
           lastDecodedBytes = Report.decodedBytes;
           lastDecodedAudioBytes = Report.decodedAudioBytes;
+          lastAudioBitRate = totalAudioBitRate;
+          lastVideoBitRate = totalVideoBitRate;
 
           // As soon as we start decoding video frames, collect data
           if (snapshot.decodedFrames > 0) {

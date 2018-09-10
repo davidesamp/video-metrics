@@ -7,12 +7,24 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import CSSModules from 'react-css-modules';
 import styles from './VideoStats.scss';
+import { getSessionVideoMetrics } from '../../../services/metrics';
 
 class VideoStats extends React.Component {
 
 
   componentDidMount = () => {
 
+  }
+
+  _getMetrics = () =>  {
+    const sessionId = localStorage.getItem('sessionId');
+
+      let intervalId = setInterval(
+        function () {
+          getSessionVideoMetrics(sessionId).then(data => {
+          debugger;
+        });
+      }, 5000)
   }
 
   render () {
