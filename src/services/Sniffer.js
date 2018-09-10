@@ -119,7 +119,7 @@ export const sniffVideoMetrics = () => {
 
   intervalId = setInterval(
         function () {
-          Report.effectiveTime: dateNow,
+          Report.effectiveTime= dateNow,
           Report.decodedFrames = getDecodedFrameCount(video);
           Report.droppedFrames = getDroppedFrameCount(video);
           Report.decodedBytes = getDecodedVideoByteCount(video)
