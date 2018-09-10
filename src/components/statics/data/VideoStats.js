@@ -1,15 +1,9 @@
 import React from 'react';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
+import { Table } from 'antd';
 import CSSModules from 'react-css-modules';
 import styles from './VideoStats.scss';
-import { getSessionVideoMetrics } from '../../../services/metrics';
-import _ from 'lodash';
 import axios from 'axios';
+import 'antd/dist/antd.css';
 
 const config = {
   server: 'https://5b9249cb4c818e001456e8f5.mockapi.io/video-metrics/v1/'
@@ -51,41 +45,27 @@ class VideoStats extends React.Component {
   }
 
   render () {
-    return (
-       <Paper className={`${styles.paper}`}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell numeric>Decoded audio (Bytes)</TableCell>
-                <TableCell numeric>Decoded video (Bytes)</TableCell>
-                <TableCell numeric>Decoded Frames</TableCell>
-                <TableCell numeric>Dropped Frames</TableCell>
-                <TableCell numeric>User Agent</TableCell>
-                <TableCell numeric>Url</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {this.state.records.map((record) => {
-                return (
-                  <TableRow>                    
-                    <TableCell>{record.effectiveTime}</TableCell>
-                    <TableCell>{record.decodedAudioBytes}</TableCell>
-                    <TableCell>{record.decodedBytes}</TableCell>
-                    <TableCell numeric>{record.decodedFrames}</TableCell>
-                    <TableCell numeric>{record.droppedFrames}</TableCell>
-                    <TableCell numeric>{record.userAgent}</TableCell>
-                    <TableCell numeric>{record.url}</TableCell>
-                  </TableRow>
-                )
-              })}
+    const columns = [
+      { title: 'Effective Time', dataIndex: 'effectiveTime', key: 'effectiveTime' },
+      { title: 'Decoded audio (Bytes)', dataIndex: 'decodedAudioBytes', key: 'decodedAudioBytes' },
+      { title: 'Decoded Video (Bytes)', dataIndex: 'decodedBytes', key: 'decodedBytes' },
+      { title: 'Decoded Frames', dataIndex: 'decodedFrames', key: 'decodedFrames' },
+      { title: 'Dropped Frames', dataIndex: 'droppedFrames', key: 'droppedFrames' },
+      { title: 'Url', dataIndex: 'url', key: 'url' },
+    ];
 
-            </TableBody>
-          </Table>
-       </Paper>
+
+    return (
+       <div style={{'margin' : '100px'}}>
+          <Table
+          columns={columns}
+          dataSource={this.state.records}
+          expandedRowRender={record => <p style={{ margin: 0 }}>{record.userAgent}</p>}
+          />
+       </div>
     )
 
   }
 }
 
-export default CSSModules(VideoStats, styles)
+export default VideoStats;

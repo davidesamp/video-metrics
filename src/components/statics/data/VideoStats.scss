@@ -1,4 +1,30 @@
 
+  :global {
+
   .paper {
-    margin-top:10px
+    margin:100px;
   }
+
+  .ant-table-row-expand-icon {
+    cursor: pointer;
+    display: inline-block;
+    width: 17px;
+    height: 17px;
+    text-align: center;
+    line-height: 14px;
+    border: 1px solid #e8e8e8;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background: #fff;
+}
+
+.ant-table-row-expanded:after {
+    content: '-';
+}
+
+.ant-table-row-collapsed:after {
+    content: '+';
+ }
+}
