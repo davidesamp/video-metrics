@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import VideoPlayer from './components/video/VideoPlayer';
+import VideoStats from './components/statics/data/VideoStats';
 
 class App extends Component {
   render() {
@@ -15,6 +16,7 @@ class App extends Component {
         </p>
         <main>
           <VideoPlayer/>
+          <VideoStats/>
         </main>
       </div>
     );
