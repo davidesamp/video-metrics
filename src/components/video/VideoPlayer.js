@@ -23,20 +23,14 @@ class VideoPlayerSand extends React.Component {
   }
   render () {
     return (
-      <div className="wygui app">
-        {/*<video  preload={'none'} loop={'loop'} controls>
-          <source src={'http://techslides.com/demos/sample-videos/small.webm'} type={'video/webm'}/>
-          <source src={'http://techslides.com/demos/sample-videos/small.ogg'} type={'video/ogg'}/>
-          <source src={'http://techslides.com/demos/sample-videos/small.mp4'} type={'video/mp4'}/>
-          <source src={'http://techslides.com/demos/sample-videos/small.3gp'} type={'video/3gp'}/>
-        </video>*/}
-
-        <VideoPlayer
+      <div >
+       <VideoPlayer
           onClosePlayer={this._onCloseVideo}
           onShareClips={this._onShareClips}
           onDownloadClips={this._onDownloadClips}
           token={'davideg'}
           userId={120619}
+          embedded
           groupId={200}
           subgroupId={1124}
           language={'it'}
@@ -44,7 +38,6 @@ class VideoPlayerSand extends React.Component {
           input={'2120720'}
           autoplay={false}
           quality="fullhd"
-          modal={false}
           hideTools
       />
       </div>

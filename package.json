@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@wyscout/video-player": "^1.7.8",
+    "@wyscout/wygui": "^2.6.1",
     "antd": "^3.9.2",
     "autoprefixer": "7.1.6",
     "axios": "^0.18.0",
