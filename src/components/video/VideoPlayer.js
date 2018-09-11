@@ -23,7 +23,7 @@ class VideoPlayerSand extends React.Component {
   }
   render () {
     return (
-      <div >
+      <div style={{'width' : '50%', 'left' : '25%', 'position' : 'relative'}}>
        <VideoPlayer
           onClosePlayer={this._onCloseVideo}
           onShareClips={this._onShareClips}

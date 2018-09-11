@@ -95,7 +95,8 @@ class VideoStats extends React.Component {
 
     return (
        <div style={{'margin' : '100px'}}>
-          <Table
+          <Table          
+          bordered
           columns={columns}
           dataSource={this.state.records}
           expandedRowRender={record => this._getInnerRow(record)}
