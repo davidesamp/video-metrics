@@ -66,7 +66,7 @@ class VideoStats extends React.Component {
     const columns = [
     { title: 'Effective Time', dataIndex: 'effectiveTime', key: 'effectiveTime' },
     { title: 'Decoded Frames (fps)', dataIndex: 'decodedFrames', key: 'decodedFrames' },
-    { title: 'Dropped frames (B/s)', dataIndex: 'droppedFrames', key: 'droppedFrames' },
+    { title: 'Dropped frames (fps)', dataIndex: 'droppedFrames', key: 'droppedFrames' },
     { title: 'Video BitRate (b/s)', dataIndex: 'videoBitRate', key: 'videoBitRate' },
     { title: 'Audio BitRate (b/s)', dataIndex: 'audioBitRate', key: 'audioBitRate' },
   ];

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import styles from './App.css';
-import VideoPlayer from './components/video/VideoPlayer';
+import VideoPlayerSand from './components/video/VideoPlayer';
 import VideoStats from './components/statics/data/VideoStats';
 import CSSModules from 'react-css-modules';
 
@@ -16,7 +16,7 @@ class App extends Component {
         <p className={'AppIntro'}>
         </p>
         <main>
-          <VideoPlayer/>
+          <VideoPlayerSand/>
           <VideoStats/>
         </main>
       </div>
