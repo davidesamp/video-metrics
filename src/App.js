@@ -8,12 +8,12 @@ import CSSModules from 'react-css-modules';
 class App extends Component {
   render() {
     return (
-      <div className={styles.App}>
-        <header className={styles.AppHeader}>
-          <img src={logo} className={styles.AppLogo} alt="logo" />
-          <h1 className={styles.AppTitle}>Video metrics</h1>
+      <div className={'App'}>
+        <header className={'AppHeader'}>
+          <img src={logo} className={'AppLogo'} alt="logo" />
+          <h1 className={'AppTitle'}>Video metrics</h1>
         </header>
-        <p className={styles.AppIntro}>
+        <p className={'AppIntro'}>
         </p>
         <main>
           <VideoPlayer/>
