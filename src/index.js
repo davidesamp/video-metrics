@@ -5,6 +5,7 @@ import App from './App';
 import WyApp from './WyApp';
 import registerServiceWorker from './registerServiceWorker';
 import '@wyscout/wygui/dist/bundle.css';
+import './styles/styles.scss';
 
 ReactDOM.render(<App />, document.getElementById('root'));
 registerServiceWorker();

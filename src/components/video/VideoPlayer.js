@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { sniffVideoMetrics } from '../../services/Sniffer';
 import VideoPlayer from '@wyscout/video-player';
 
+
 class VideoPlayerSand extends React.Component {
 
   componentDidMount = () => {
@@ -36,7 +37,7 @@ class VideoPlayerSand extends React.Component {
           language={'it'}
           source={'match'}
           input={'2120720'}
-          autoplay={false}
+          autoplay
           quality="fullhd"
           hideTools
       />

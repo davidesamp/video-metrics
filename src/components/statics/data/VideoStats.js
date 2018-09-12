@@ -4,7 +4,8 @@ import CSSModules from 'react-css-modules';
 import styles from './VideoStats.scss';
 import axios from 'axios';
 import 'antd/dist/antd.css';
-import _ from 'lodash'
+import _ from 'lodash';
+import { Button } from '@wyscout/wygui';
 
 const config = {
   server: 'https://5b9249cb4c818e001456e8f5.mockapi.io/video-metrics/v1/'
@@ -61,6 +62,8 @@ class VideoStats extends React.Component {
     });
   }
 
+  _getSnapshotsByetricId = metricId => _.filter(this.state.snapshots, {'metricId': metricId});
+
   _getInnerRow = (record) => {
 
     const columns = [
@@ -71,14 +74,61 @@ class VideoStats extends React.Component {
     { title: 'Audio BitRate (b/s)', dataIndex: 'audioBitRate', key: 'audioBitRate' },
   ];
 
-    const currentSnapshots = _.filter(this.state.snapshots, {'metricId': record.id});
-
+    const currentSnapshots = this._getSnapshotsByetricId(record.id);
 
     return (
       <Table
         columns={columns}
         dataSource={currentSnapshots}
       />
+    )
+  }
+
+  _deleteSnapshot = (snapshots) => {
+    const _self = this;
+    this.state.snapshots.forEach((snapshot) => {
+      axios({
+        method: 'DELETE',
+        url: config.server + 'snaphots/' + snapshot.id ,
+      }).then(res => {
+      }).catch(networkError => {
+          throw networkError;
+      });
+    });
+  }
+
+  _deleteAllRecords = () => {
+    const _self = this;
+    this.state.records.forEach((record) => {
+      const metricId = record.id;
+      axios({
+        method: 'DELETE',
+        url: config.server + 'metrics/' + metricId,
+      }).then(res => {
+          const currentSnapshots = this._getSnapshotsByetricId(metricId);
+          debugger;
+          this._deleteSnapshot(currentSnapshots)
+      }).catch(networkError => {
+          throw networkError;
+      });
+    })
+
+    this.setState({
+      records:[],
+      snapshots:[]
+    })
+  }
+
+  _getHeaderContent = () => {
+    return (
+      <div className={'stats-header'}>
+      <Button
+         className={'stats-header-clean'}
+         label={'Clean'}
+         theme={'primary'}
+         disabled={!this.state.records || this.state.records.length <= 0}
+         onClick={this._deleteAllRecords}/>
+      </div>
     )
   }
 
@@ -94,8 +144,9 @@ class VideoStats extends React.Component {
 
 
     return (
-       <div style={{'margin' : '100px'}}>
-          <Table          
+       <div className={'stats-container'}>
+          {this._getHeaderContent()}
+          <Table
           bordered
           columns={columns}
           dataSource={this.state.records}
@@ -107,4 +158,4 @@ class VideoStats extends React.Component {
   }
 }
 
-export default VideoStats;
+export default CSSModules(VideoStats, styles);
