@@ -106,7 +106,6 @@ class VideoStats extends React.Component {
         url: config.server + 'metrics/' + metricId,
       }).then(res => {
           const currentSnapshots = this._getSnapshotsByetricId(metricId);
-          debugger;
           this._deleteSnapshot(currentSnapshots)
       }).catch(networkError => {
           throw networkError;
@@ -139,9 +138,14 @@ class VideoStats extends React.Component {
       { title: 'Decoded Video (Bytes)', dataIndex: 'decodedBytes', key: 'decodedBytes' },
       { title: 'Decoded Frames', dataIndex: 'decodedFrames', key: 'decodedFrames' },
       { title: 'Dropped Frames', dataIndex: 'droppedFrames', key: 'droppedFrames' },
-      { title: 'Url', dataIndex: 'url', key: 'url' },
+      { title: 'src', dataIndex: 'src', key: 'src' },
+      { title: 'Duration (Seconds)', dataIndex: 'duration', key: 'duration' },
     ];
 
+    const datasource = this.state.records.map((record) => {
+       record.src = record.src.split('?')[0];
+       return record;
+    })
 
     return (
        <div className={'stats-container'}>
@@ -149,7 +153,7 @@ class VideoStats extends React.Component {
           <Table
           bordered
           columns={columns}
-          dataSource={this.state.records}
+          dataSource={datasource}
           expandedRowRender={record => this._getInnerRow(record)}
           />
        </div>

@@ -50,6 +50,13 @@ const getDroppedFrameCount = (video) => {
   return video.webkitDroppedFrameCount;
 }
 
+const getDuration = video => video.duration;
+const isPaused = video => video.paused;
+const getSrc = video => video.src;
+
+const getCurrentTime  = video => video.currentTime;
+
+
 const lastElem = (elems) => {
   return elems[elems.length - 1];
 }
@@ -98,8 +105,6 @@ const sendJsonSnapshots = (snapshots, metricId) => {
         url: config.server + 'snaphots',
         data : snap
       }).then(res => {
-         console.log(res);
-         console.log(res.data);
       });
   })
   }
@@ -119,13 +124,16 @@ export const sniffVideoMetrics = () => {
 
   intervalId = setInterval(
         function () {
-          Report.effectiveTime= dateNow,
+
+          Report.effectiveTime = dateNow,
           Report.decodedFrames = getDecodedFrameCount(video);
           Report.droppedFrames = getDroppedFrameCount(video);
           Report.decodedBytes = getDecodedVideoByteCount(video)
           Report.decodedAudioBytes = getDecodedAudioByteCount(video);
           Report.displaySupportFullscreen = displaySupportFullScreen(video);
           Report.sessionId = sessionId
+          Report.src = getSrc(video);
+          Report.duration = getDuration(video);
           totalVideoBitRate = convertBytesToBits(Report.decodedBytes);
           totalAudioBitRate = convertBytesToBits(Report.decodedAudioBytes);
 
@@ -140,6 +148,7 @@ export const sniffVideoMetrics = () => {
             displayIsFullscreen: displayIsFullscreen(video),
             videoBitRate: totalVideoBitRate - lastVideoBitRate,
             audioBitRate: totalAudioBitRate - lastAudioBitRate,
+            currentTime : getCurrentTime(video),
           };
 
           lastDecodedFrames = Report.decodedFrames;
