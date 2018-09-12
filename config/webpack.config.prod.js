@@ -57,6 +57,11 @@ module.exports = {
   devtool: shouldUseSourceMap ? 'source-map' : false,
   // In production, we only want to load the polyfills and the app code.
   entry: [require.resolve('./polyfills'), paths.appIndexJs],
+  devServer: {
+    host: "localhost.wyscout.com",
+    port: 3000,
+    https: true
+},
   output: {
     // The build folder.
     path: paths.appBuild,

@@ -18,7 +18,8 @@ let Report = {
   platform: window.navigator.platform || 'not defined',
   snapshots: [],
   userAgent: window.navigator.userAgent || 'not defined',
-  url: window.location.href || 'not defined'
+  url: window.location.href || 'not defined',
+  dowloadTime: null,
 };
 
 const STYLE_WARNING = 'background: yellow; color: black;';
@@ -55,6 +56,24 @@ const isPaused = video => video.paused;
 const getSrc = video => video.src;
 
 const getCurrentTime  = video => video.currentTime;
+
+const getDowloadTime = (video) => {
+  const initDate = new Date();
+  axios({
+    method: 'GET',
+    url: getSrc(video),
+  }).then(res => {
+     if(res.date){
+       const headersDate = res.date
+       const finalDate = new Date();
+       const diffwithHeader = initDate.getTime() - headersDate.getTime();
+       const diffwithFinal = initDate.getTime() - finalDate.getTime();
+       debugger;
+     }
+  }).catch(networkError => {
+      throw networkError;
+  });
+}
 
 
 const lastElem = (elems) => {
@@ -124,7 +143,9 @@ export const sniffVideoMetrics = () => {
 
   intervalId = setInterval(
         function () {
-
+          if(!Report.dowloadTime) {
+            Report.downlodTime = getDowloadTime(video);
+          }
           Report.effectiveTime = dateNow,
           Report.decodedFrames = getDecodedFrameCount(video);
           Report.droppedFrames = getDroppedFrameCount(video);

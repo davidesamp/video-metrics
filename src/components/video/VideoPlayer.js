@@ -37,7 +37,7 @@ class VideoPlayerSand extends React.Component {
           language={'it'}
           source={'match'}
           input={'2120720'}
-          autoplay={false}
+          autoplay
           quality="fullhd"
           hideTools
       />
