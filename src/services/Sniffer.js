@@ -114,7 +114,8 @@ const sendJsonReport = (Report) => {
        url: config.server + 'metrics',
        data : Report
       }).then(res => {
-        const {id, decodeFrames } = res.data;
+        const {id} = res.data;
+        debugger;
         sendJsonSnapshots(snapshots, id)
      });
   }
@@ -127,7 +128,7 @@ const sendJsonSnapshots = (snapshots, metricId) => {
 
       axios({
         method: 'POST',
-        url: config.server + 'snaphots',
+        url: config.server + 'metrics/' + metricId + '/snaphots',
         data : snap
       }).then(res => {
       });
@@ -150,6 +151,17 @@ const formatBufferedRanges = (video) => {
     });
   }
   return formattedRanges;
+}
+
+const formatPlayedRanges = (video) => {
+  let formattedPlayedRanges = [];
+  for(let i = 0; i < video.played.length; i++ ){
+    formattedPlayedRanges.push({
+      start : video.played.start(i),
+      end: video.played.end(i)
+    });
+  }
+  return formattedPlayedRanges;
 }
 
 
@@ -175,6 +187,7 @@ export const sniffVideoMetrics = () => {
           Report.src = getSrc(video);
           Report.duration = getDuration(video);
           Report.bufferedRanges = formatBufferedRanges(video);
+          Report.playedRanges = formatPlayedRanges(video);
           totalVideoBitRate = convertBytesToBits(Report.decodedBytes);
           totalAudioBitRate = convertBytesToBits(Report.decodedAudioBytes);
 

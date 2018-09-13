@@ -34,11 +34,28 @@ class VideoStats extends React.Component {
             method: 'get',
             url: config.server + 'metrics',
           }).then(res => {
-             if(res.data && res.data.length > 0){
 
-               _self.setState({
-                 records : res.data
-               }, () => _self._getSnapshots())
+             if(res.data && res.data.length > 0){
+               let totalMetrics = [];
+
+               res.data.forEach(metric => {
+                 _self._getSnapshotById(metric.id).then(res => {
+                    if(res.data && res.data.length > 0){
+                      totalMetrics.push({
+                        ...metric,
+                        snapshots: res.data,
+                      });
+                      _self.setState({
+                        records : totalMetrics
+                      })
+                    }
+                 }).catch(networkError => {
+                     throw networkError;
+                 });
+               })
+
+
+
              }
           }).catch(networkError => {
               throw networkError;
@@ -46,20 +63,14 @@ class VideoStats extends React.Component {
       }, 10000)
   }
 
-  _getSnapshots = () =>  {
+
+
+  _getSnapshotById = (metricId) =>  {
     const _self = this;
-    axios({
-      method: 'get',
-      url: config.server + 'snaphots',
-    }).then(res => {
-       if(res.data && res.data.length > 0){
-         _self.setState({
-           snapshots : res.data
-         })
-       }
-    }).catch(networkError => {
-        throw networkError;
-    });
+    return  axios({
+        method: 'get',
+        url: config.server + 'metrics/' + metricId +  '/snaphots',
+      })
   }
 
   _getSnapshotsByetricId = metricId => _.filter(this.state.snapshots, {'metricId': metricId});
@@ -74,7 +85,7 @@ class VideoStats extends React.Component {
     { title: 'Audio BitRate (b/s)', dataIndex: 'audioBitRate', key: 'audioBitRate' },
   ];
 
-    const currentSnapshots = this._getSnapshotsByetricId(record.id);
+    const currentSnapshots = record.snapshots;
 
     return (
       <Table
@@ -84,12 +95,12 @@ class VideoStats extends React.Component {
     )
   }
 
-  _deleteSnapshot = (snapshots) => {
+  _deleteSnapshot = (snapshots, metricId) => {
     const _self = this;
     this.state.snapshots.forEach((snapshot) => {
       axios({
         method: 'DELETE',
-        url: config.server + 'snaphots/' + snapshot.id ,
+        url: config.server + 'metrics/' + metricId + '/snaphots/' + snapshot.id ,
       }).then(res => {
       }).catch(networkError => {
           throw networkError;
@@ -106,7 +117,7 @@ class VideoStats extends React.Component {
         url: config.server + 'metrics/' + metricId,
       }).then(res => {
           const currentSnapshots = this._getSnapshotsByetricId(metricId);
-          this._deleteSnapshot(currentSnapshots)
+          this._deleteSnapshot(currentSnapshots, metricId)
       }).catch(networkError => {
           throw networkError;
       });
@@ -149,14 +160,12 @@ class VideoStats extends React.Component {
       { title: 'Dropped Frames', dataIndex: 'droppedFrames', key: 'droppedFrames' },
       { title: 'src', dataIndex: 'src', key: 'src' },
       { title: 'Duration (Seconds)', dataIndex: 'duration', key: 'duration' },
-      { title: 'Buffered Times Ranges(Seconds)', dataIndex: 'bufferedRanges',  key: 'bufferedRanges', render: this._renderTimesRanges},
+      { title: 'Buffered Times Ranges (Seconds)', dataIndex: 'bufferedRanges',  key: 'bufferedRanges', render: this._renderTimesRanges},
+      { title: 'Played Times Ranges (Seconds)', dataIndex: 'playedRanges',  key: 'playedRanges', render: this._renderTimesRanges},
     ];
 
     const datasource = this.state.records.map((record) => {
        record.src = record.src.split('?')[0];
-       /*record.formattedRanges = Array.isArray(record.bufferedRanges)
-                              ? record.bufferedRanges.map(range => `start: ${range.start} - end: ${range.end}`).join('||')
-                              : "";*/
        return record;
     })
 
