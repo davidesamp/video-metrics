@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import logo from './ball.svg';
 import styles from './App.css';
 import VideoPlayerSand from './components/video/VideoPlayer';
 import VideoStats from './components/statics/data/VideoStats';

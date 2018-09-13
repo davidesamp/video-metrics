@@ -11,6 +11,13 @@ const config = {
   server: 'https://5b9249cb4c818e001456e8f5.mockapi.io/video-metrics/v1/'
 }
 
+const networkState = {
+  0: 'NETWORK_EMPTY',
+  1: 'NETWORK_IDLE',
+  2: 'NETWORK_LOADING',
+  3: 'NETWORK_NO_SOURCE'
+}
+
 class VideoStats extends React.Component {
   constructor() {
         super();
@@ -78,11 +85,12 @@ class VideoStats extends React.Component {
   _getInnerRow = (record) => {
 
     const columns = [
-    { title: 'Effective Time', dataIndex: 'effectiveTime', key: 'effectiveTime' },
+    { title: 'Date', dataIndex: 'effectiveTime', key: 'effectiveTime', render: this._renderFormattedDate },
     { title: 'Decoded Frames (fps)', dataIndex: 'decodedFrames', key: 'decodedFrames' },
     { title: 'Dropped frames (fps)', dataIndex: 'droppedFrames', key: 'droppedFrames' },
     { title: 'Video BitRate (b/s)', dataIndex: 'videoBitRate', key: 'videoBitRate' },
     { title: 'Audio BitRate (b/s)', dataIndex: 'audioBitRate', key: 'audioBitRate' },
+    { title: 'Network State', dataIndex: 'networkState', key: 'networkState', render: this._renderNetworState },
   ];
 
     const currentSnapshots = record.snapshots;
@@ -151,9 +159,13 @@ class VideoStats extends React.Component {
     ) : ( <span>{' N/D '}</span>)
   }
 
+  _renderFormattedDate = (stringDate) => <span>{new Date(stringDate).toLocaleString()}</span>
+
+  _renderNetworState = networStatusCode => <span>{networkState[networStatusCode]}</span>
+
   render () {
     const columns = [
-      { title: 'Effective Time', dataIndex: 'effectiveTime', key: 'effectiveTime' },
+      { title: 'Date Start', dataIndex: 'effectiveTime', key: 'effectiveTime', render: this._renderFormattedDate },
       { title: 'Decoded audio (Bytes)', dataIndex: 'decodedAudioBytes', key: 'decodedAudioBytes' },
       { title: 'Decoded Video (Bytes)', dataIndex: 'decodedBytes', key: 'decodedBytes' },
       { title: 'Decoded Frames', dataIndex: 'decodedFrames', key: 'decodedFrames' },
@@ -161,6 +173,7 @@ class VideoStats extends React.Component {
       { title: 'src', dataIndex: 'src', key: 'src' },
       { title: 'Duration (Seconds)', dataIndex: 'duration', key: 'duration' },
       { title: 'Buffered Times Ranges (Seconds)', dataIndex: 'bufferedRanges',  key: 'bufferedRanges', render: this._renderTimesRanges},
+      { title: 'Seekable Times Ranges (Seconds)', dataIndex: 'seekableRanges',  key: 'seekableRanges', render: this._renderTimesRanges},
       { title: 'Played Times Ranges (Seconds)', dataIndex: 'playedRanges',  key: 'playedRanges', render: this._renderTimesRanges},
     ];
 

@@ -55,6 +55,7 @@ const getDroppedFrameCount = (video) => {
 const getDuration = video => video.duration;
 const isPaused = video => video.paused;
 const getSrc = video => video.src;
+const getNetworkState = video => video.networkState;
 
 const getCurrentTime  = video => video.currentTime;
 
@@ -153,6 +154,17 @@ const formatBufferedRanges = (video) => {
   return formattedRanges;
 }
 
+const formatSeekableRanges = (video) => {
+  let formattedSeekableRanges = [];
+  for(let i = 0; i < video.seekable.length; i++ ){
+    formattedSeekableRanges.push({
+      start : video.seekable.start(i),
+      end: video.seekable.end(i)
+    });
+  }
+  return formattedSeekableRanges;
+}
+
 const formatPlayedRanges = (video) => {
   let formattedPlayedRanges = [];
   for(let i = 0; i < video.played.length; i++ ){
@@ -188,6 +200,7 @@ export const sniffVideoMetrics = () => {
           Report.duration = getDuration(video);
           Report.bufferedRanges = formatBufferedRanges(video);
           Report.playedRanges = formatPlayedRanges(video);
+          Report.seekableRanges = formatSeekableRanges(video);
           totalVideoBitRate = convertBytesToBits(Report.decodedBytes);
           totalAudioBitRate = convertBytesToBits(Report.decodedAudioBytes);
 
@@ -203,6 +216,7 @@ export const sniffVideoMetrics = () => {
             videoBitRate: totalVideoBitRate - lastVideoBitRate,
             audioBitRate: totalAudioBitRate - lastAudioBitRate,
             currentTime : getCurrentTime(video),
+            networkState: getNetworkState(video),
           };
 
           lastDecodedFrames = Report.decodedFrames;
