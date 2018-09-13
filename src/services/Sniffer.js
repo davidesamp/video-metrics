@@ -14,6 +14,7 @@ let totalAudioBitRate = 0;
 let totalVideoBitRate = 0;
 let intervalId;
 let cachedDecodedFrames = [];
+let downloadTime = 0;
 let Report = {
   platform: window.navigator.platform || 'not defined',
   snapshots: [],
@@ -57,12 +58,17 @@ const getSrc = video => video.src;
 
 const getCurrentTime  = video => video.currentTime;
 
-const getDowloadTime = (video) => {
+const testDowloadTime = (video) => {
   const initDate = new Date();
   axios({
     method: 'GET',
+    headers: {
+      'Content-Type': 'audio/mp4',
+    },
     url: getSrc(video),
   }).then(res => {
+      debugger;
+      downloadTime = 2;
      if(res.date){
        const headersDate = res.date
        const finalDate = new Date();
@@ -135,6 +141,18 @@ const initSessionStorage  = () => {
   return id;
 }
 
+const formatBufferedRanges = (video) => {
+  let formattedRanges = [];
+  for(let i = 0; i < video.buffered.length; i++ ){
+    formattedRanges.push({
+      start : video.buffered.start(i),
+      end: video.buffered.end(i)
+    });
+  }
+  return formattedRanges;
+}
+
+
 export const sniffVideoMetrics = () => {
   const video = document.querySelector('video');
   const dateNow = new Date();
@@ -143,9 +161,10 @@ export const sniffVideoMetrics = () => {
 
   intervalId = setInterval(
         function () {
-          if(!Report.dowloadTime) {
-            Report.downlodTime = getDowloadTime(video);
-          }
+         /* if(!downloadTime) {
+           testDowloadTime(video);
+            Report.downlodTime = downloadTime;
+          } */
           Report.effectiveTime = dateNow,
           Report.decodedFrames = getDecodedFrameCount(video);
           Report.droppedFrames = getDroppedFrameCount(video);
@@ -155,6 +174,7 @@ export const sniffVideoMetrics = () => {
           Report.sessionId = sessionId
           Report.src = getSrc(video);
           Report.duration = getDuration(video);
+          Report.bufferedRanges = formatBufferedRanges(video);
           totalVideoBitRate = convertBytesToBits(Report.decodedBytes);
           totalAudioBitRate = convertBytesToBits(Report.decodedAudioBytes);
 

@@ -131,6 +131,15 @@ class VideoStats extends React.Component {
     )
   }
 
+  _renderTimesRanges = (ranges, arg2, arg3) => {
+    debugger;
+    return  Array.isArray(ranges) ? (
+        <ul>
+          {ranges.map((range, index) => <li className='table-times-range' key={index}>{`Start: ${range.start} - End: ${range.end}`}</li>)}
+        </ul>
+    ) : ( <span>{' N/D '}</span>)
+  }
+
   render () {
     const columns = [
       { title: 'Effective Time', dataIndex: 'effectiveTime', key: 'effectiveTime' },
@@ -140,10 +149,14 @@ class VideoStats extends React.Component {
       { title: 'Dropped Frames', dataIndex: 'droppedFrames', key: 'droppedFrames' },
       { title: 'src', dataIndex: 'src', key: 'src' },
       { title: 'Duration (Seconds)', dataIndex: 'duration', key: 'duration' },
+      { title: 'Buffered Times Ranges(Seconds)', dataIndex: 'bufferedRanges',  key: 'bufferedRanges', render: this._renderTimesRanges},
     ];
 
     const datasource = this.state.records.map((record) => {
        record.src = record.src.split('?')[0];
+       /*record.formattedRanges = Array.isArray(record.bufferedRanges)
+                              ? record.bufferedRanges.map(range => `start: ${range.start} - end: ${range.end}`).join('||')
+                              : "";*/
        return record;
     })
 

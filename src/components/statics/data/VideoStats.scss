@@ -5,6 +5,11 @@ $btn-primary-color: #00ace6;
     display: flex;
     flex-direction: column;
 
+    .table-times-range {
+      font-size: 12px;
+      padding:6px;
+    }
+
     .stats-header {
       position: relative;
       margin-bottom: 20px;
