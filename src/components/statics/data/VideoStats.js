@@ -6,10 +6,7 @@ import axios from 'axios';
 import 'antd/dist/antd.css';
 import _ from 'lodash';
 import { Button } from '@wyscout/wygui';
-
-const config = {
-  server: 'https://5b9249cb4c818e001456e8f5.mockapi.io/video-metrics/v1/'
-}
+import { API_SERVER } from '../../../config/config.js';
 
 const networkState = {
   0: 'NETWORK_EMPTY',
@@ -23,7 +20,10 @@ class VideoStats extends React.Component {
         super();
         this.state = {
             records: [],
-            snapshots: []
+            snapshots: [],
+            fetching: false,
+            sortedInfo: null,
+            innerSort: null,
         };
     }
 
@@ -32,83 +32,61 @@ class VideoStats extends React.Component {
   }
 
   _getMetrics = () =>  {
-    const sessionId = localStorage.getItem('sessionId');
     const _self = this;
+    this.setState({
+      ...this.state,
+      fetching: true
+    }, () => {
+      axios({
+        method: 'get',
+        url: API_SERVER + 'metrics',
+      }).then(res => {
 
-      let intervalId = setInterval(
-        function () {
-          axios({
-            method: 'get',
-            url: config.server + 'metrics',
-          }).then(res => {
+         if(res.data && res.data.length > 0){
+           let totalMetrics = [];
 
-             if(res.data && res.data.length > 0){
-               let totalMetrics = [];
+           res.data.forEach(metric => {
+             _self._getSnapshotById(metric.id).then(res => {
+                if(res.data && res.data.length > 0){
+                  totalMetrics.push({
+                    ...metric,
+                    snapshots: res.data,
+                  });
+                  _self.setState({
+                    records : totalMetrics
+                  })
+                }
+             }).catch(networkError => {
+                 throw networkError;
+             });
+           })
+         }
+      }).catch(networkError => {
+          throw networkError;
+      });
+    })
 
-               res.data.forEach(metric => {
-                 _self._getSnapshotById(metric.id).then(res => {
-                    if(res.data && res.data.length > 0){
-                      totalMetrics.push({
-                        ...metric,
-                        snapshots: res.data,
-                      });
-                      _self.setState({
-                        records : totalMetrics
-                      })
-                    }
-                 }).catch(networkError => {
-                     throw networkError;
-                 });
-               })
+    this.setState({
+      ...this.state,
+      fetching: false
+    });
 
-
-
-             }
-          }).catch(networkError => {
-              throw networkError;
-          });
-      }, 10000)
   }
 
-
-
   _getSnapshotById = (metricId) =>  {
-    const _self = this;
     return  axios({
         method: 'get',
-        url: config.server + 'metrics/' + metricId +  '/snaphots',
+        url: API_SERVER + 'metrics/' + metricId +  '/snaphots',
       })
   }
 
   _getSnapshotsByetricId = metricId => _.filter(this.state.snapshots, {'metricId': metricId});
 
-  _getInnerRow = (record) => {
-
-    const columns = [
-    { title: 'Date', dataIndex: 'effectiveTime', key: 'effectiveTime', render: this._renderFormattedDate },
-    { title: 'Decoded Frames (fps)', dataIndex: 'decodedFrames', key: 'decodedFrames' },
-    { title: 'Dropped frames (fps)', dataIndex: 'droppedFrames', key: 'droppedFrames' },
-    { title: 'Video BitRate (b/s)', dataIndex: 'videoBitRate', key: 'videoBitRate' },
-    { title: 'Audio BitRate (b/s)', dataIndex: 'audioBitRate', key: 'audioBitRate' },
-    { title: 'Network State', dataIndex: 'networkState', key: 'networkState', render: this._renderNetworState },
-  ];
-
-    const currentSnapshots = record.snapshots;
-
-    return (
-      <Table
-        columns={columns}
-        dataSource={currentSnapshots}
-      />
-    )
-  }
-
   _deleteSnapshot = (snapshots, metricId) => {
-    const _self = this;
     this.state.snapshots.forEach((snapshot) => {
       axios({
         method: 'DELETE',
-        url: config.server + 'metrics/' + metricId + '/snaphots/' + snapshot.id ,
+        url: API_SERVER + 'metrics/' + metricId + '/snaphots/' + snapshot.id ,
       }).then(res => {
       }).catch(networkError => {
           throw networkError;
@@ -122,7 +100,7 @@ class VideoStats extends React.Component {
       const metricId = record.id;
       axios({
         method: 'DELETE',
-        url: config.server + 'metrics/' + metricId,
+        url: API_SERVER + 'metrics/' + metricId,
       }).then(res => {
           const currentSnapshots = this._getSnapshotsByetricId(metricId);
           this._deleteSnapshot(currentSnapshots, metricId)
@@ -137,12 +115,21 @@ class VideoStats extends React.Component {
     })
   }
 
+  _handleGetMetrics = () => {
+    this._getMetrics();
+  };
+
   _getHeaderContent = () => {
     return (
       <div className={'stats-header'}>
       <Button
-         className={'stats-header-clean'}
-         label={'Clean'}
+         className={'stats-header-btn load'}
+         label={'Load Metrics'}
+         theme={'primary'}
+         onClick={this._handleGetMetrics}/>
+      <Button
+         className={'stats-header-btn clean'}
+         label={'Clean Table'}
          theme={'primary'}
          disabled={!this.state.records || this.state.records.length <= 0}
          onClick={this._deleteAllRecords}/>
@@ -151,7 +138,6 @@ class VideoStats extends React.Component {
   }
 
   _renderTimesRanges = (ranges, arg2, arg3) => {
-    debugger;
     return  Array.isArray(ranges) ? (
         <ul>
           {ranges.map((range, index) => <li className='table-times-range' key={index}>{`Start: ${range.start} - End: ${range.end}`}</li>)}
@@ -159,22 +145,59 @@ class VideoStats extends React.Component {
     ) : ( <span>{' N/D '}</span>)
   }
 
+  _handleChange = (pagination, filters, sorter) => {
+    this.setState({
+      sortedInfo: sorter,
+    });
+  }
+
+  _handleInnerRowChange = (pagination, filters, sorter) => {
+    this.setState({
+      innerSort: sorter,
+    });
+  }
+
   _renderFormattedDate = (stringDate) => <span>{new Date(stringDate).toLocaleString()}</span>
 
   _renderNetworState = networStatusCode => <span>{networkState[networStatusCode]}</span>
 
-  render () {
+  _getInnerRow = (record) => {
+    let { innerSort } = this.state;
+     innerSort = innerSort || {};
     const columns = [
-      { title: 'Date Start', dataIndex: 'effectiveTime', key: 'effectiveTime', render: this._renderFormattedDate },
-      { title: 'Decoded audio (Bytes)', dataIndex: 'decodedAudioBytes', key: 'decodedAudioBytes' },
-      { title: 'Decoded Video (Bytes)', dataIndex: 'decodedBytes', key: 'decodedBytes' },
-      { title: 'Decoded Frames', dataIndex: 'decodedFrames', key: 'decodedFrames' },
-      { title: 'Dropped Frames', dataIndex: 'droppedFrames', key: 'droppedFrames' },
+    { title: 'Date', dataIndex: 'effectiveTime', key: 'effectiveTime', render: this._renderFormattedDate, sortOrder: innerSort.columnKey === 'effectiveTime' && innerSort.order, sorter: (a, b) => new Date(a.effectiveTime) - new Date(b.effectiveTime) },
+    { title: 'Decoded Frames (fps)', dataIndex: 'decodedFrames', key: 'decodedFrames',sortOrder: innerSort.columnKey === 'decodedFrames' && innerSort.order, sorter: (a, b) => a.decodedFrames -b.decodedFrames },
+    { title: 'Dropped frames (fps)', dataIndex: 'droppedFrames', key: 'droppedFrames', sortOrder: innerSort.columnKey === 'droppedFrames' && innerSort.order, sorter: (a, b) => a.droppedFrames -b.droppedFrames },
+    { title: 'Video BitRate (b/s)', dataIndex: 'videoBitRate', key: 'videoBitRate', sortOrder: innerSort.columnKey === 'videoBitRate' && innerSort.order, sorter: (a, b) => a.videoBitRate -b.videoBitRate },
+    { title: 'Audio BitRate (b/s)', dataIndex: 'audioBitRate', key: 'audioBitRate', sortOrder: innerSort.columnKey === 'audioBitRate' && innerSort.order, sorter: (a, b) => a.audioBitRate -b.audioBitRate },
+    { title: 'Network State', dataIndex: 'networkState', key: 'networkState', render: this._renderNetworState, sortOrder: innerSort.columnKey === 'networkState' && innerSort.order, sorter: (a, b) => a.networkState -b.networkState },
+  ];
+
+    const currentSnapshots = record.snapshots;
+
+    return (
+      <Table
+        columns={columns}
+        dataSource={currentSnapshots}
+        onChange={this._handleInnerRowChange}
+      />
+    )
+  }
+
+  render () {
+    let { sortedInfo } = this.state;
+     sortedInfo = sortedInfo || {};
+    const columns = [
+      { title: 'Date Start', dataIndex: 'effectiveTime', key: 'effectiveTime', render: this._renderFormattedDate, sortOrder: sortedInfo.columnKey === 'effectiveTime' && sortedInfo.order, sorter: (a, b) => new Date(a.effectiveTime) - new Date(b.effectiveTime), },
+      { title: 'Decoded audio (Bytes)', dataIndex: 'decodedAudioBytes', key: 'decodedAudioBytes', sortOrder: sortedInfo.columnKey === 'decodedAudioBytes' && sortedInfo.order, sorter: (a, b) => a.decodedAudioBytes - b.decodedAudioBytes },
+      { title: 'Decoded Video (Bytes)', dataIndex: 'decodedBytes', key: 'decodedBytes', sortOrder: sortedInfo.columnKey === 'decodedBytes' && sortedInfo.order, sorter: (a, b) => a.decodedBytes - b.decodedBytes },
+      { title: 'Decoded Frames', dataIndex: 'decodedFrames', key: 'decodedFrames', sortOrder: sortedInfo.columnKey === 'decodedFrames' && sortedInfo.order, sorter: (a, b) => a.decodedFrames - b.decodedFrames },
+      { title: 'Dropped Frames', dataIndex: 'droppedFrames', key: 'droppedFrames', sortOrder: sortedInfo.columnKey === 'droppedFrames' && sortedInfo.order, sorter: (a, b) => a.droppedFrames - b.droppedFrames  },
       { title: 'src', dataIndex: 'src', key: 'src' },
       { title: 'Duration (Seconds)', dataIndex: 'duration', key: 'duration' },
       { title: 'Buffered Times Ranges (Seconds)', dataIndex: 'bufferedRanges',  key: 'bufferedRanges', render: this._renderTimesRanges},
-      { title: 'Seekable Times Ranges (Seconds)', dataIndex: 'seekableRanges',  key: 'seekableRanges', render: this._renderTimesRanges},
       { title: 'Played Times Ranges (Seconds)', dataIndex: 'playedRanges',  key: 'playedRanges', render: this._renderTimesRanges},
+      { title: 'Seekable Times Ranges (Seconds)', dataIndex: 'seekableRanges',  key: 'seekableRanges', render: this._renderTimesRanges},
     ];
 
     const datasource = this.state.records.map((record) => {
@@ -186,9 +209,11 @@ class VideoStats extends React.Component {
        <div className={'stats-container'}>
           {this._getHeaderContent()}
           <Table
+          loading={this.state.fetching}
           bordered
           columns={columns}
           dataSource={datasource}
+          onChange={this._handleChange}
           expandedRowRender={record => this._getInnerRow(record)}
           />
        </div>

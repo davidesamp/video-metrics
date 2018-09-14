@@ -14,7 +14,7 @@ $btn-primary-color: #00ace6;
       position: relative;
       margin-bottom: 20px;
 
-      .stats-header-clean {
+      .stats-header-btn {
         background-color: $btn-primary-color;
         color: #fff;
         border-color: $btn-primary-color;
@@ -35,6 +35,18 @@ $btn-primary-color: #00ace6;
         line-height: 1 !important;
         min-height: 36px;
         border: 1px solid #e4e4e4;
+      }
+
+      .stats-header-btn:focus {
+        background-color: #1ac5ff;
+      }
+
+      .clean {
+        float: right;
+      }
+
+      .load {
+        min-height: 46px;
       }
     }
 }

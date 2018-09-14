@@ -1,9 +1,7 @@
 import axios from 'axios';
 import { convertBytesToBits } from '../utilities/converter'
+import { API_SERVER } from '../config/config.js';
 
-const config = {
-  server: 'https://5b9249cb4c818e001456e8f5.mockapi.io/video-metrics/v1/'
-}
 let lastDecodedFrames = 0;
 let lastDroppedFrames = 0;
 let lastDecodedBytes = 0;
@@ -68,14 +66,12 @@ const testDowloadTime = (video) => {
     },
     url: getSrc(video),
   }).then(res => {
-      debugger;
       downloadTime = 2;
      if(res.date){
        const headersDate = res.date
        const finalDate = new Date();
        const diffwithHeader = initDate.getTime() - headersDate.getTime();
        const diffwithFinal = initDate.getTime() - finalDate.getTime();
-       debugger;
      }
   }).catch(networkError => {
       throw networkError;
@@ -112,11 +108,10 @@ const sendJsonReport = (Report) => {
     const jsonReport = JSON.stringify(Report)
      axios({
        method: 'POST',
-       url: config.server + 'metrics',
+       url: API_SERVER + 'metrics',
        data : Report
       }).then(res => {
         const {id} = res.data;
-        debugger;
         sendJsonSnapshots(snapshots, id)
      });
   }
@@ -129,7 +124,7 @@ const sendJsonSnapshots = (snapshots, metricId) => {
 
       axios({
         method: 'POST',
-        url: config.server + 'metrics/' + metricId + '/snaphots',
+        url: API_SERVER + 'metrics/' + metricId + '/snaphots',
         data : snap
       }).then(res => {
       });
