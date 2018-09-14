@@ -5,7 +5,7 @@ import styles from './VideoStats.scss';
 import axios from 'axios';
 import 'antd/dist/antd.css';
 import _ from 'lodash';
-import { Button } from '@wyscout/wygui';
+import { Button } from 'antd';
 import { API_SERVER } from '../../../config/config.js';
 
 const networkState = {
@@ -123,16 +123,14 @@ class VideoStats extends React.Component {
     return (
       <div className={'stats-header'}>
       <Button
-         className={'stats-header-btn load'}
-         label={'Load Metrics'}
-         theme={'primary'}
-         onClick={this._handleGetMetrics}/>
-      <Button
-         className={'stats-header-btn clean'}
-         label={'Clean Table'}
-         theme={'primary'}
+         size={'large'}
+         type={'primary'}
+         onClick={this._handleGetMetrics}>{'Load Metrics'}</Button>
+      <Button        
+         className={'clean'}
+         type={'primary'}
          disabled={!this.state.records || this.state.records.length <= 0}
-         onClick={this._deleteAllRecords}/>
+         onClick={this._deleteAllRecords}>{'Clean Table'}</Button>
       </div>
     )
   }
