@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { sniffVideoMetrics } from '../../services/Sniffer';
+import { sniffVideoMetrics } from '../../services/Sniffer2';
 import VideoPlayer from '@wyscout/video-player';
 
 
