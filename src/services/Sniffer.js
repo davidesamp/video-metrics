@@ -2,6 +2,7 @@ import axios from 'axios';
 import { convertBytesToBits } from '../utilities/converter'
 import { API_SERVER } from '../config/config.js';
 
+
 let lastDecodedFrames = 0;
 let lastDroppedFrames = 0;
 let lastDecodedBytes = 0;
@@ -184,7 +185,7 @@ export const sniffVideoMetrics = () => {
            testDowloadTime(video);
             Report.downlodTime = downloadTime;
           } */
-          Report.effectiveTime = dateNow,
+          Report.effectiveTime = dateNow;
           Report.decodedFrames = getDecodedFrameCount(video);
           Report.droppedFrames = getDroppedFrameCount(video);
           Report.decodedBytes = getDecodedVideoByteCount(video)

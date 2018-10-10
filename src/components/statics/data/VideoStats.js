@@ -126,7 +126,7 @@ class VideoStats extends React.Component {
          size={'large'}
          type={'primary'}
          onClick={this._handleGetMetrics}>{'Load Metrics'}</Button>
-      <Button        
+      <Button
          className={'clean'}
          type={'primary'}
          disabled={!this.state.records || this.state.records.length <= 0}
@@ -195,7 +195,10 @@ class VideoStats extends React.Component {
       { title: 'Duration (Seconds)', dataIndex: 'duration', key: 'duration' },
       { title: 'Buffered Times Ranges (Seconds)', dataIndex: 'bufferedRanges',  key: 'bufferedRanges', render: this._renderTimesRanges},
       { title: 'Played Times Ranges (Seconds)', dataIndex: 'playedRanges',  key: 'playedRanges', render: this._renderTimesRanges},
-      { title: 'Seekable Times Ranges (Seconds)', dataIndex: 'seekableRanges',  key: 'seekableRanges', render: this._renderTimesRanges},
+      //{ title: 'Seekable Times Ranges (Seconds)', dataIndex: 'seekableRanges',  key: 'seekableRanges', render: this._renderTimesRanges},
+      { title: 'joinedTime', dataIndex: 'joinedTimes',  key: 'joinedTimes'},
+      { title: 'Rebuffering times (MSeconds)', dataIndex: 'rebufferingTime',  key: 'rebufferingTime'},
+      { title: 'Rebuffering Events', dataIndex: 'rebufferingEvents',  key: 'rebufferingEvents'},
     ];
 
     const datasource = this.state.records.map((record) => {

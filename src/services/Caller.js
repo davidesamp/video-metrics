@@ -5,7 +5,7 @@ import { API_SERVER } from '../config/config.js';
 export const sendJsonReport = (report) => {
     const snapshots = report.snapshots;
     delete report.snapshots;
-    const jsonReport = JSON.stringify(report)
+    // const jsonReport = JSON.stringify(report)
      axios({
        method: 'POST',
        url: API_SERVER + 'metrics',
@@ -16,7 +16,7 @@ export const sendJsonReport = (report) => {
      });
 }
 
-export const sendJsonSnapshots = (snapshots, metricId) => {
+const sendJsonSnapshots = (snapshots, metricId) => {
   if(Array.isArray(snapshots))
   {
     snapshots.forEach((snap) => {
