@@ -187,7 +187,6 @@ export const sniffVideoMetrics = () => {
           const snapshotsToSave = Array.from(report.snapshots); //su mockapi salva tutto quindi devo eliminare le props che non ci sono in tabella
           sendJsonReport(report).then(res => {
             const {id} = res.data;
-            debugger;
             sendJsonSnapshots(snapshotsToSave, id)
             report.id = id;
            });

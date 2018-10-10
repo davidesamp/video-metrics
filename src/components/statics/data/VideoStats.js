@@ -7,6 +7,7 @@ import 'antd/dist/antd.css';
 import _ from 'lodash';
 import { Button } from 'antd';
 import { API_SERVER } from '../../../config/config.js';
+import { calculateBufferingEventsRate } from '../../../utilities/stats';
 
 const networkState = {
   0: 'NETWORK_EMPTY',
@@ -159,6 +160,12 @@ class VideoStats extends React.Component {
 
   _renderNetworState = networStatusCode => <span>{networkState[networStatusCode]}</span>
 
+_renderBufferEventsRate = (bufferedEvents, row, index) => {
+      return (
+        <span>{calculateBufferingEventsRate(row.playedRanges, bufferedEvents)}</span>
+      )
+  }
+
   _getInnerRow = (record) => {
     let { innerSort } = this.state;
      innerSort = innerSort || {};
@@ -196,9 +203,9 @@ class VideoStats extends React.Component {
       { title: 'Buffered Times Ranges (Seconds)', dataIndex: 'bufferedRanges',  key: 'bufferedRanges', render: this._renderTimesRanges},
       { title: 'Played Times Ranges (Seconds)', dataIndex: 'playedRanges',  key: 'playedRanges', render: this._renderTimesRanges},
       //{ title: 'Seekable Times Ranges (Seconds)', dataIndex: 'seekableRanges',  key: 'seekableRanges', render: this._renderTimesRanges},
-      { title: 'joinedTime', dataIndex: 'joinedTimes',  key: 'joinedTimes'},
+      { title: 'joinedTime', dataIndex: 'joinedTime',  key: 'joinedTime'},
       { title: 'Rebuffering times (MSeconds)', dataIndex: 'rebufferingTime',  key: 'rebufferingTime'},
-      { title: 'Rebuffering Events', dataIndex: 'rebufferingEvents',  key: 'rebufferingEvents'},
+      { title: 'Rebuffering Events', dataIndex: 'rebufferingEvents',  key: 'rebufferingEvents', render : this._renderBufferEventsRate},
     ];
 
     const datasource = this.state.records.map((record) => {
