@@ -192,7 +192,7 @@ class VideoStats extends React.Component {
       { title: 'Decoded Frames', dataIndex: 'decodedFrames', key: 'decodedFrames', sortOrder: sortedInfo.columnKey === 'decodedFrames' && sortedInfo.order, sorter: (a, b) => a.decodedFrames - b.decodedFrames },
       { title: 'Dropped Frames', dataIndex: 'droppedFrames', key: 'droppedFrames', sortOrder: sortedInfo.columnKey === 'droppedFrames' && sortedInfo.order, sorter: (a, b) => a.droppedFrames - b.droppedFrames  },
       { title: 'src', dataIndex: 'src', key: 'src' },
-      { title: 'Duration (Seconds)', dataIndex: 'duration', key: 'duration' },
+      //{ title: 'Duration (Seconds)', dataIndex: 'duration', key: 'duration' },
       { title: 'Buffered Times Ranges (Seconds)', dataIndex: 'bufferedRanges',  key: 'bufferedRanges', render: this._renderTimesRanges},
       { title: 'Played Times Ranges (Seconds)', dataIndex: 'playedRanges',  key: 'playedRanges', render: this._renderTimesRanges},
       //{ title: 'Seekable Times Ranges (Seconds)', dataIndex: 'seekableRanges',  key: 'seekableRanges', render: this._renderTimesRanges},

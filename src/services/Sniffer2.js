@@ -36,6 +36,7 @@ import {
 
 import {
   sendJsonReport,
+  sendJsonSnapshots,
 } from './Caller';
 
 import { MAX_SNIFFING_SESSION} from '../config/config';
@@ -72,9 +73,6 @@ const lastElemsAreEqual = (elems, n) => {
     .filter(getUnequal).length === 0;
 }
 
-const ciccia = () => {
-  console.log('ciccia' );
-}
 
 export const sniffVideoMetrics = () => {
   const video = document.querySelector('video');
@@ -179,13 +177,21 @@ export const sniffVideoMetrics = () => {
         cachedDecodedFrames.pop();
       }*/
 
-      if((report.snapshots && report.snapshots.length > 60) || numSeconds > MAX_SNIFFING_SESSION)
+      if((report.snapshots && report.snapshots.length > 10) || numSeconds > MAX_SNIFFING_SESSION)
       {
           console.log('joinedTime --> ' + getJoinedTime());
           report.setJoinedTime(getJoinedTime());
           report.setRebufferingTime(getTotalRebufferingTime());
           report.setRebufferingEvents(getTotalRebufferingEventsNum());
-          sendJsonReport(report);
+          //Sdelete report.snapshots;
+          const snapshotsToSave = Array.from(report.snapshots); //su mockapi salva tutto quindi devo eliminare le props che non ci sono in tabella
+          sendJsonReport(report).then(res => {
+            const {id} = res.data;
+            debugger;
+            sendJsonSnapshots(snapshotsToSave, id)
+            report.id = id;
+           });
+
           numSeconds = 0;
           report.clearSnapshots();
       }

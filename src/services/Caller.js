@@ -3,20 +3,15 @@ import { API_SERVER } from '../config/config.js';
 
 
 export const sendJsonReport = (report) => {
-    const snapshots = report.snapshots;
-    delete report.snapshots;
-    // const jsonReport = JSON.stringify(report)
-     axios({
-       method: 'POST',
-       url: API_SERVER + 'metrics',
+  console.log('report id in call --> ', report.id);
+     return axios({
+       method: report.id ? 'PUT' : 'POST',
+       url:    report.id ?  API_SERVER + `metrics/${report.id}` : API_SERVER + 'metrics' ,
        data : report
-      }).then(res => {
-        const {id} = res.data;
-        sendJsonSnapshots(snapshots, id)
-     });
+      })
 }
 
-const sendJsonSnapshots = (snapshots, metricId) => {
+export const sendJsonSnapshots = (snapshots, metricId) => {
   if(Array.isArray(snapshots))
   {
     snapshots.forEach((snap) => {
