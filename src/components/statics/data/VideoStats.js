@@ -162,13 +162,13 @@ class VideoStats extends React.Component {
 
   _renderBufferEventsRate = (bufferedEvents, row, index) => {
         return (
-          <span>{calculateBufferingEventsRate(row.playedRanges, bufferedEvents)}</span>
+          <span>{calculateBufferingEventsRate(row.playedRanges, bufferedEvents).toFixed(2)}</span>
         )
   }
 
   _renderBufferRatio = (rebufferingTime, row, index) => {
     return (
-      <span>{calculateBufferRatio(row.playedRanges, rebufferingTime)}</span>
+      <span>{calculateBufferRatio(row.playedRanges, rebufferingTime).toFixed(2)}</span>
     )
   }
 
@@ -206,13 +206,11 @@ class VideoStats extends React.Component {
       { title: 'Dropped Frames', dataIndex: 'droppedFrames', key: 'droppedFrames', align: 'center', width: 100, sortOrder: sortedInfo.columnKey === 'droppedFrames' && sortedInfo.order, sorter: (a, b) => a.droppedFrames - b.droppedFrames  },
       { title: 'src', dataIndex: 'src', key: 'src', width: 120, align: 'center' },
       { title: 'ipAddress', dataIndex: 'ipAddress', key: 'ipAddress', align: 'center', width: 120,},
-      //{ title: 'Duration (Seconds)', dataIndex: 'duration', key: 'duration' },
       { title: 'Buffered Times Ranges (Seconds)', dataIndex: 'bufferedRanges',  key: 'bufferedRanges', render: this._renderTimesRanges},
       { title: 'Played Times Ranges (Seconds)', dataIndex: 'playedRanges',  key: 'playedRanges', render: this._renderTimesRanges},
-      //{ title: 'Seekable Times Ranges (Seconds)', dataIndex: 'seekableRanges',  key: 'seekableRanges', render: this._renderTimesRanges},
       { title: 'Joined Time (ms)', dataIndex: 'joinedTime', align: 'center', width: 100,  key: 'joinedTime'},
-      { title: 'Buffer Ratio %', dataIndex: 'rebufferingTime',  key: 'rebufferingTime', render: this._renderBufferRatio},
-      { title: 'Rebuffering Events', dataIndex: 'rebufferingEvents',  key: 'rebufferingEvents', render : this._renderBufferEventsRate},
+      { title: 'Buffer Ratio %', dataIndex: 'rebufferingTime',  key: 'rebufferingTime', align: 'center', render: this._renderBufferRatio},
+      { title: 'Rebuffering Events', dataIndex: 'rebufferingEvents',  key: 'rebufferingEvents', align: 'center', render : this._renderBufferEventsRate},
     ];
 
     const datasource = this.state.records.map((record) => {
@@ -225,6 +223,7 @@ class VideoStats extends React.Component {
           {this._getHeaderContent()}
           <Table
           size={'small'}
+          pagination={{position:'both'}}
           loading={this.state.fetching}
           bordered
           columns={columns}

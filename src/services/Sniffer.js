@@ -52,6 +52,7 @@ let lastAudioBitRate = 0;
 let lastVideoBitRate = 0;
 let totalAudioBitRate = 0;
 let totalVideoBitRate = 0;
+let requestAnimationId = 0;
 
 const STYLE_INFO = 'background: blue; color: white;';
 
@@ -93,10 +94,10 @@ export const sniffVideoMetrics = () => {
 
 
   (function timer() {
-    requestAnimFrame(timer);
+    requestAnimationId =  requestAnimFrame(timer);
 
     if(numPausedSeconds > 20)
-       cancelAnimationFrame(timer);
+       cancelAnimationFrame(requestAnimationId);
 
     let currentTime = (new Date()).getTime();
 
@@ -176,15 +177,6 @@ export const sniffVideoMetrics = () => {
           numSeconds = 0;
           report.clearSnapshots();
       }
-
-      // Stop collecting data when decoded frames stop increasing
-      // and send report to the server
-       /* if (lastElemsAreEqual(cachedDecodedFrames, CDF_SIZE)) {
-        cancelAnimationFrame(timer);
-        Report.snapshots.slice(0, Report.snapshots.length - CDF_SIZE + 1);
-        sendJsonReport(Report);
-      } */
-
     }
   }());
 }
