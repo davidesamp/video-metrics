@@ -7,7 +7,7 @@ import 'antd/dist/antd.css';
 import _ from 'lodash';
 import { Button } from 'antd';
 import { API_SERVER } from '../../../config/config.js';
-import { calculateBufferingEventsRate } from '../../../utilities/stats';
+import { calculateBufferingEventsRate, calculateBufferRatio } from '../../../utilities/stats';
 
 const networkState = {
   0: 'NETWORK_EMPTY',
@@ -160,10 +160,16 @@ class VideoStats extends React.Component {
 
   _renderNetworState = networStatusCode => <span>{networkState[networStatusCode]}</span>
 
-_renderBufferEventsRate = (bufferedEvents, row, index) => {
-      return (
-        <span>{calculateBufferingEventsRate(row.playedRanges, bufferedEvents)}</span>
-      )
+  _renderBufferEventsRate = (bufferedEvents, row, index) => {
+        return (
+          <span>{calculateBufferingEventsRate(row.playedRanges, bufferedEvents)}</span>
+        )
+  }
+
+  _renderBufferRatio = (rebufferingTime, row, index) => {
+    return (
+      <span>{calculateBufferRatio(row.playedRanges, rebufferingTime)}</span>
+    )
   }
 
   _getInnerRow = (record) => {
@@ -194,17 +200,18 @@ _renderBufferEventsRate = (bufferedEvents, row, index) => {
      sortedInfo = sortedInfo || {};
     const columns = [
       { title: 'Date Start', dataIndex: 'effectiveTime', key: 'effectiveTime', render: this._renderFormattedDate, sortOrder: sortedInfo.columnKey === 'effectiveTime' && sortedInfo.order, sorter: (a, b) => new Date(a.effectiveTime) - new Date(b.effectiveTime), },
-      { title: 'Decoded audio (Bytes)', dataIndex: 'decodedAudioBytes', key: 'decodedAudioBytes', sortOrder: sortedInfo.columnKey === 'decodedAudioBytes' && sortedInfo.order, sorter: (a, b) => a.decodedAudioBytes - b.decodedAudioBytes },
-      { title: 'Decoded Video (Bytes)', dataIndex: 'decodedBytes', key: 'decodedBytes', sortOrder: sortedInfo.columnKey === 'decodedBytes' && sortedInfo.order, sorter: (a, b) => a.decodedBytes - b.decodedBytes },
-      { title: 'Decoded Frames', dataIndex: 'decodedFrames', key: 'decodedFrames', sortOrder: sortedInfo.columnKey === 'decodedFrames' && sortedInfo.order, sorter: (a, b) => a.decodedFrames - b.decodedFrames },
-      { title: 'Dropped Frames', dataIndex: 'droppedFrames', key: 'droppedFrames', sortOrder: sortedInfo.columnKey === 'droppedFrames' && sortedInfo.order, sorter: (a, b) => a.droppedFrames - b.droppedFrames  },
-      { title: 'src', dataIndex: 'src', key: 'src' },
+      { title: 'Decoded audio (Bytes)', dataIndex: 'decodedAudioBytes', key: 'decodedAudioBytes', align: 'center', width: 120, sortOrder: sortedInfo.columnKey === 'decodedAudioBytes' && sortedInfo.order, sorter: (a, b) => a.decodedAudioBytes - b.decodedAudioBytes },
+      { title: 'Decoded Video (Bytes)', dataIndex: 'decodedBytes', key: 'decodedBytes', align: 'center', width: 120, sortOrder: sortedInfo.columnKey === 'decodedBytes' && sortedInfo.order, sorter: (a, b) => a.decodedBytes - b.decodedBytes },
+      { title: 'Decoded Frames', dataIndex: 'decodedFrames', key: 'decodedFrames', align: 'center', width: 100, sortOrder: sortedInfo.columnKey === 'decodedFrames' && sortedInfo.order, sorter: (a, b) => a.decodedFrames - b.decodedFrames },
+      { title: 'Dropped Frames', dataIndex: 'droppedFrames', key: 'droppedFrames', align: 'center', width: 100, sortOrder: sortedInfo.columnKey === 'droppedFrames' && sortedInfo.order, sorter: (a, b) => a.droppedFrames - b.droppedFrames  },
+      { title: 'src', dataIndex: 'src', key: 'src', width: 120, align: 'center' },
+      { title: 'ipAddress', dataIndex: 'ipAddress', key: 'ipAddress', align: 'center', width: 120,},
       //{ title: 'Duration (Seconds)', dataIndex: 'duration', key: 'duration' },
       { title: 'Buffered Times Ranges (Seconds)', dataIndex: 'bufferedRanges',  key: 'bufferedRanges', render: this._renderTimesRanges},
       { title: 'Played Times Ranges (Seconds)', dataIndex: 'playedRanges',  key: 'playedRanges', render: this._renderTimesRanges},
       //{ title: 'Seekable Times Ranges (Seconds)', dataIndex: 'seekableRanges',  key: 'seekableRanges', render: this._renderTimesRanges},
-      { title: 'joinedTime', dataIndex: 'joinedTime',  key: 'joinedTime'},
-      { title: 'Rebuffering times (MSeconds)', dataIndex: 'rebufferingTime',  key: 'rebufferingTime'},
+      { title: 'Joined Time (ms)', dataIndex: 'joinedTime', align: 'center', width: 100,  key: 'joinedTime'},
+      { title: 'Buffer Ratio %', dataIndex: 'rebufferingTime',  key: 'rebufferingTime', render: this._renderBufferRatio},
       { title: 'Rebuffering Events', dataIndex: 'rebufferingEvents',  key: 'rebufferingEvents', render : this._renderBufferEventsRate},
     ];
 
@@ -217,6 +224,7 @@ _renderBufferEventsRate = (bufferedEvents, row, index) => {
        <div className={'stats-container'}>
           {this._getHeaderContent()}
           <Table
+          size={'small'}
           loading={this.state.fetching}
           bordered
           columns={columns}

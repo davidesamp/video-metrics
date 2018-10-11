@@ -37,6 +37,7 @@ import {
 import {
   sendJsonReport,
   sendJsonSnapshots,
+  getIpAddress,
 } from './Caller';
 
 import { MAX_SNIFFING_SESSION} from '../config/config';
@@ -51,28 +52,8 @@ let lastAudioBitRate = 0;
 let lastVideoBitRate = 0;
 let totalAudioBitRate = 0;
 let totalVideoBitRate = 0;
-let cachedDecodedFrames = [];
 
 const STYLE_INFO = 'background: blue; color: white;';
-
-const CDF_SIZE = 5;
-
-const lastElem = (elems) => {
-  return elems[elems.length - 1];
-}
-
-const getUnequal = (elem, index, arr) => {
-  return lastElem(arr) != elem;
-}
-
-const lastElemsAreEqual = (elems, n) => {
-  if (lastElem(elems) === 0 || elems.length !== n) {
-    return false
-  }
-  return elems.slice(elems.length - n, elems.length)
-    .filter(getUnequal).length === 0;
-}
-
 
 export const sniffVideoMetrics = () => {
   const video = document.querySelector('video');
@@ -85,7 +66,14 @@ export const sniffVideoMetrics = () => {
   video.addEventListener('canplaythrough', canplaythrough, false);
   video.addEventListener('waiting', waiting, false);
 
-  const dateNow = new Date();
+    const report = new Report();
+    getIpAddress().then((response) => {
+      if(response && response.data) {
+        const hostipInfo =  response.data.split("\n");
+        const ipAddress = hostipInfo[2].split(':')[1]
+        report.setIpAddress(ipAddress)
+      }
+    })
 
   const requestAnimFrame = (function(){
       return  window.requestAnimationFrame   ||
@@ -102,7 +90,7 @@ export const sniffVideoMetrics = () => {
   //var displayNode = document.getElementById('display');
   let numSeconds = 0;
   let numPausedSeconds = 0;
-  const report = new Report();
+
 
   (function timer() {
     requestAnimFrame(timer);
@@ -170,12 +158,6 @@ export const sniffVideoMetrics = () => {
           ' dropped frames: ' + snapshot.droppedFrames,
           STYLE_INFO);
       }
-
-      // Cache last N decoded frames (N=CDF_SIZE)
-      /*cachedDecodedFrames.unshift(Report.decodedFrames);
-      if (cachedDecodedFrames.length > CDF_SIZE) {
-        cachedDecodedFrames.pop();
-      }*/
 
       if((report.snapshots && report.snapshots.length > 10) || numSeconds > MAX_SNIFFING_SESSION)
       {

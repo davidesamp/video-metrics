@@ -26,3 +26,10 @@ export const sendJsonSnapshots = (snapshots, metricId) => {
   })
   }
 }
+
+export const getIpAddress = () => {
+  return axios({
+    method: 'GET',
+    url: 'http://api.hostip.info/get_html.php',
+  })
+}

@@ -28,4 +28,6 @@ export default class Report {
 
   setRebufferingEvents = (rebufferingEvents) => this.rebufferingEvents = rebufferingEvents;
 
+  setIpAddress = (ipAddress) => this.ipAddress = ipAddress;
+
 }
